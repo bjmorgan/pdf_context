@@ -18,7 +18,7 @@ class String
   
 end
 
-search_string = "Goldacre" # will find all pdfs containing "Ben Goldacre"
+search_string = "Ben Goldacre" # will find all pdfs containing "Ben Goldacre"
 text_string = "Goldacre" # will search for "Goldacre" inside each pdf
 before = 10 # these are the number of words before
 after = 10  # and after the appearance of "bar" that are printed

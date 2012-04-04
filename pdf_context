@@ -1,0 +1,39 @@
+#!/usr/local/bin/ruby
+
+require 'pdf-reader' # https://github.com/yob/pdf-reader
+
+class String
+  
+  def as_words # returns an array of words
+    return self.delete("\n").split(/[ ]+/)
+  end
+  
+  def report_item( string, before, after )
+    index = /#{string}/ =~ self
+    return nil if index.nil?
+    words_before = self[0..index-1].as_words[-before..-1].join(" ")
+    words_after = self[index+string.length+1..-1].as_words[0..after].join(" ")
+    return "#{words_before} **#{string}** #{words_after}"
+  end
+  
+end
+
+search_string = "Goldacre" # will find all pdfs containing "Ben Goldacre"
+text_string = "Goldacre" # will search for "Goldacre" inside each pdf
+before = 10 # these are the number of words before
+after = 10  # and after the appearance of "bar" that are printed
+
+files = %x[mdfind -interpret \'"#{search_string}" kind:pdf\'].split("\n")
+
+files.each do |file|
+  puts "## " + File.basename( file ) + "\n" + "[link](file://#{file.gsub(" ",'%20')})\n\n"
+    
+  pdf = PDF::Reader.new( file )
+  pdf.pages.each_with_index do |page, p|
+    index = /#{text_string}/ =~ page.text
+    unless index.nil?
+      puts "* Page #{p}:\n"
+      print "    * " + page.text.report_item( text_string, before, after ) + "\n\n"
+    end
+  end 
+end
